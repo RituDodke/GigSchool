@@ -12,6 +12,9 @@ class JobService:
     def get_jobs_by_group(self, group_id: str) -> List[Job]:
         return job_repository.get_by_group(group_id)
 
+    def get_all_jobs(self) -> List[Job]:
+        return job_repository.get_all()
+
     def get_job(self, job_id: UUID) -> Optional[Job]:
         return job_repository.get(job_id)
 

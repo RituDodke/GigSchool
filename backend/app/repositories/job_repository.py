@@ -12,4 +12,12 @@ class JobRepository(IBugSchoolRepository[Job, JobCreate, JobUpdate]):
             print(f"Error fetching jobs for group {group_id}: {e}")
             return []
 
+    def get_all(self) -> List[Job]:
+        try:
+            response = supabase.table(self.table_name).select("*").order("created_at", desc=True).limit(50).execute()
+            return [self.model(**item) for item in response.data]
+        except Exception as e:
+            print(f"Error fetching all jobs: {e}")
+            return []
+
 job_repository = JobRepository(Job, "jobs")

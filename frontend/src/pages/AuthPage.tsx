@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
-import { Loader2, ArrowRight, Sparkles } from 'lucide-react'
+import { Loader2, ArrowRight, Briefcase } from 'lucide-react'
 
 export default function AuthPage() {
     const navigate = useNavigate()
@@ -31,50 +31,38 @@ export default function AuthPage() {
     }
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-            {/* Animated Background */}
-            <div className="absolute inset-0 -z-10">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse animation-delay-500" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl" />
-            </div>
-
-            <div className="relative z-10 w-full max-w-md p-4 animate-fade-in-up">
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="w-full max-w-sm">
                 {/* Card */}
-                <div className="glass-card p-8 md:p-10 relative overflow-hidden">
-                    {/* Top Gradient Bar */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
-
+                <div className="card p-8">
                     {/* Logo */}
                     <div className="flex justify-center mb-8">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/25 animate-pulse-glow">
-                                <Sparkles className="w-6 h-6 text-white" />
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                                <Briefcase className="w-5 h-5 text-white" />
                             </div>
-                            <h1 className="text-3xl font-bold gradient-text">
-                                GigSchool
-                            </h1>
+                            <span className="text-xl font-semibold text-gray-900">GigSchool</span>
                         </div>
                     </div>
 
                     {/* Title */}
-                    <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold text-white mb-2">
-                            {isLogin ? 'Welcome Back!' : 'Join GigSchool'}
+                    <div className="text-center mb-6">
+                        <h2 className="text-lg font-semibold text-gray-900">
+                            {isLogin ? 'Welcome back' : 'Create an account'}
                         </h2>
-                        <p className="text-slate-400">
-                            {isLogin ? 'Sign in to continue your journey' : 'Create an account to get started'}
+                        <p className="text-sm text-gray-500 mt-1">
+                            {isLogin ? 'Sign in to continue' : 'Get started for free'}
                         </p>
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                             <input
                                 type="email"
                                 required
-                                className="input-premium"
+                                className="input-clean"
                                 placeholder="you@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -82,11 +70,11 @@ export default function AuthPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                             <input
                                 type="password"
                                 required
-                                className="input-premium"
+                                className="input-clean"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -96,39 +84,39 @@ export default function AuthPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="btn-primary w-full flex items-center justify-center gap-2 mt-8"
+                            className="btn-primary w-full flex items-center justify-center gap-2 mt-6"
                         >
                             {isLoading ? (
                                 <>
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    {isLogin ? 'Signing In...' : 'Creating Account...'}
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    {isLogin ? 'Signing in...' : 'Creating account...'}
                                 </>
                             ) : (
                                 <>
-                                    {isLogin ? 'Sign In' : 'Create Account'}
-                                    <ArrowRight className="w-5 h-5" />
+                                    {isLogin ? 'Sign in' : 'Create account'}
+                                    <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
                         </button>
                     </form>
 
                     {/* Toggle */}
-                    <div className="mt-8 pt-6 border-t border-white/10 text-center">
+                    <div className="mt-6 text-center">
                         <button
                             onClick={() => setIsLogin(!isLogin)}
-                            className="text-sm text-slate-400 hover:text-white transition-colors"
+                            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
                         >
                             {isLogin ? (
-                                <>Don't have an account? <span className="text-blue-400 font-medium">Sign Up</span></>
+                                <>Don't have an account? <span className="text-orange-600 font-medium">Sign up</span></>
                             ) : (
-                                <>Already have an account? <span className="text-blue-400 font-medium">Sign In</span></>
+                                <>Already have an account? <span className="text-orange-600 font-medium">Sign in</span></>
                             )}
                         </button>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <p className="text-center text-slate-500 text-sm mt-6">
+                <p className="text-center text-xs text-gray-400 mt-6">
                     By continuing, you agree to our Terms of Service
                 </p>
             </div>

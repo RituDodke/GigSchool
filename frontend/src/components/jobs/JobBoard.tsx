@@ -22,78 +22,54 @@ export function JobBoard() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-32">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl animate-pulse" />
-                    <Loader2 className="relative w-12 h-12 text-blue-400 animate-spin" />
-                </div>
-                <p className="mt-6 text-slate-400 animate-pulse">Loading gigs...</p>
+            <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+                <p className="mt-4 text-gray-500">Loading gigs...</p>
             </div>
         )
     }
 
     if (error) {
         return (
-            <div className="glass-card p-8 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
-                    <span className="text-3xl">⚠️</span>
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Oops! Something went wrong</h3>
-                <p className="text-slate-400">Error loading jobs. Please try again later.</p>
+            <div className="card p-8 text-center">
+                <p className="text-red-600">Error loading jobs. Please try again later.</p>
             </div>
         )
     }
 
     return (
-        <div className="space-y-8">
-            {/* Header / Actions */}
-            <div className="glass-card p-4 md:p-6">
-                <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-                    {/* Search */}
-                    <div className="relative w-full md:w-96 group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
-                        <input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search gigs by title, skills..."
-                            className="input-premium pl-12"
-                        />
-                    </div>
-
-                    {/* CTA Button */}
-                    <button
-                        onClick={() => setIsCreateModalOpen(true)}
-                        className="btn-primary flex items-center gap-2 w-full md:w-auto justify-center"
-                    >
-                        <Plus className="w-5 h-5" />
-                        Post a Gig
-                    </button>
+        <div className="space-y-6">
+            {/* Actions Bar */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                {/* Search */}
+                <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search gigs..."
+                        className="input-clean pl-10"
+                    />
                 </div>
-            </div>
 
-            {/* Stats Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                    { label: 'Total Gigs', value: jobs?.length || 0, color: 'blue' },
-                    { label: 'Open', value: jobs?.filter(j => j.status === 'OPEN').length || 0, color: 'green' },
-                    { label: 'In Progress', value: jobs?.filter(j => j.status === 'IN_PROGRESS').length || 0, color: 'yellow' },
-                    { label: 'Completed', value: jobs?.filter(j => j.status === 'COMPLETED').length || 0, color: 'purple' },
-                ].map((stat, i) => (
-                    <div key={i} className="glass-card p-4 text-center hover-lift">
-                        <p className={`text-3xl font-bold text-${stat.color}-400`}>{stat.value}</p>
-                        <p className="text-sm text-slate-400 mt-1">{stat.label}</p>
-                    </div>
-                ))}
+                {/* CTA Button */}
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="btn-primary flex items-center gap-2"
+                >
+                    <Plus className="w-4 h-4" />
+                    Post a Gig
+                </button>
             </div>
 
             {/* Grid */}
             {filteredJobs && filteredJobs.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {filteredJobs.map((job, index) => (
                         <div
                             key={job.id}
-                            className="animate-fade-in-up"
-                            style={{ animationDelay: `${index * 100}ms` }}
+                            className="animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
                         >
                             <JobCard
                                 job={job}
@@ -103,20 +79,19 @@ export function JobBoard() {
                     ))}
                 </div>
             ) : (
-                <div className="glass-card p-12 md:p-20 text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
-                        <Briefcase className="w-10 h-10 text-blue-400" />
+                <div className="card p-12 text-center">
+                    <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-gray-100 flex items-center justify-center">
+                        <Briefcase className="w-6 h-6 text-gray-400" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-3">No gigs found</h3>
-                    <p className="text-slate-400 max-w-md mx-auto mb-8">
-                        We couldn't find any gigs matching your search.
-                        Be the first to post a new opportunity!
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No gigs found</h3>
+                    <p className="text-gray-500 max-w-sm mx-auto mb-6">
+                        We couldn't find any gigs. Be the first to post one!
                     </p>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
                         className="btn-primary inline-flex items-center gap-2"
                     >
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-4 h-4" />
                         Post the First Gig
                     </button>
                 </div>

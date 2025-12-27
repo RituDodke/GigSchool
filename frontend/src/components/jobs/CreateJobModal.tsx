@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Loader2, Plus, Sparkles } from 'lucide-react'
+import { X, Loader2, Plus, Briefcase } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { jobsApi } from '@/api/jobs'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -23,7 +23,6 @@ export function CreateJobModal({ isOpen, onClose }: CreateJobModalProps) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['jobs'] })
             onClose()
-            // Reset form
             setTitle('')
             setDescription('')
             setTags('')
@@ -49,105 +48,110 @@ export function CreateJobModal({ isOpen, onClose }: CreateJobModalProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/20"
                 onClick={onClose}
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-lg glass-card p-8 animate-fade-in-up overflow-hidden">
-                {/* Decorative gradient */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
-
+            <div className="relative w-full max-w-lg bg-white rounded-xl shadow-xl p-6 animate-fade-in">
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                 >
                     <X className="w-5 h-5" />
                 </button>
 
                 {/* Header */}
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <Sparkles className="w-6 h-6 text-white" />
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                        <Briefcase className="w-5 h-5 text-orange-600" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-white">Post a New Gig</h2>
-                        <p className="text-sm text-slate-400">Share what you need help with</p>
+                        <h2 className="text-lg font-semibold text-gray-900">Post a New Gig</h2>
+                        <p className="text-sm text-gray-500">Share what you need help with</p>
                     </div>
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Title</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Title</label>
                         <input
                             required
                             value={title}
                             onChange={e => setTitle(e.target.value)}
-                            className="input-premium"
+                            className="input-clean"
                             placeholder="e.g. Need help with Calculus II"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
                         <textarea
                             required
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             rows={4}
-                            className="input-premium resize-none"
-                            placeholder="Describe what you need help with in detail..."
+                            className="input-clean resize-none"
+                            placeholder="Describe what you need help with..."
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Tags</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Tags</label>
                             <input
                                 value={tags}
                                 onChange={e => setTags(e.target.value)}
-                                className="input-premium"
+                                className="input-clean"
                                 placeholder="math, tutoring"
                             />
-                            <p className="text-xs text-slate-500 mt-1">Comma separated</p>
+                            <p className="text-xs text-gray-400 mt-1">Comma separated</p>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
                             <select
                                 value={groupId}
                                 onChange={e => setGroupId(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl transition-all duration-300 bg-slate-800 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 hover:border-white/20 appearance-none cursor-pointer"
-                                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
+                                className="input-clean"
                             >
-                                <option value="general" className="bg-slate-800 text-white">General</option>
-                                <option value="tutoring" className="bg-slate-800 text-white">Tutoring</option>
-                                <option value="design" className="bg-slate-800 text-white">Design</option>
-                                <option value="coding" className="bg-slate-800 text-white">Coding</option>
-                                <option value="writing" className="bg-slate-800 text-white">Writing</option>
-                                <option value="other" className="bg-slate-800 text-white">Other</option>
+                                <option value="general">General</option>
+                                <option value="tutoring">Tutoring</option>
+                                <option value="design">Design</option>
+                                <option value="coding">Coding</option>
+                                <option value="writing">Writing</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={createJobMutation.isPending}
-                        className="btn-primary w-full flex items-center justify-center gap-2 mt-8"
-                    >
-                        {createJobMutation.isPending ? (
-                            <>
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                                Creating...
-                            </>
-                        ) : (
-                            <>
-                                <Plus className="w-5 h-5" />
-                                Post Gig
-                            </>
-                        )}
-                    </button>
+                    <div className="flex gap-3 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="btn-secondary flex-1"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={createJobMutation.isPending}
+                            className="btn-primary flex-1 flex items-center justify-center gap-2"
+                        >
+                            {createJobMutation.isPending ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                <>
+                                    <Plus className="w-4 h-4" />
+                                    Post Gig
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

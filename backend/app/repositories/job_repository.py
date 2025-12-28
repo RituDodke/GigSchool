@@ -55,11 +55,12 @@ class JobRepository(IBugSchoolRepository[Job, JobCreate, JobUpdate]):
             print(f"Error fetching job {id}: {e}")
             return None
 
-    def update(self, id: UUID, obj_in: JobUpdate) -> Optional[Job]:
+    def update(self, id: UUID, obj_in: JobUpdate, client=None) -> Optional[Job]:
+        db = client or supabase
         obj_data = jsonable_encoder(obj_in, exclude_unset=True)
         obj_data = {k: v for k, v in obj_data.items() if v is not None}
         try:
-            response = supabase.table(self.table_name).update(obj_data).eq("id", str(id)).execute()
+            response = db.table(self.table_name).update(obj_data).eq("id", str(id)).execute()
             if response.data:
                 return self.get(id)  # Re-fetch with creator
             return None
@@ -67,9 +68,10 @@ class JobRepository(IBugSchoolRepository[Job, JobCreate, JobUpdate]):
             print(f"Error updating job: {e}")
             raise e
 
-    def delete(self, id: UUID) -> bool:
+    def delete(self, id: UUID, client=None) -> bool:
+        db = client or supabase
         try:
-            response = supabase.table(self.table_name).delete().eq("id", str(id)).execute()
+            response = db.table(self.table_name).delete().eq("id", str(id)).execute()
             return len(response.data) > 0
         except Exception as e:
             print(f"Error deleting job: {e}")

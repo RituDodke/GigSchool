@@ -1,6 +1,8 @@
 from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
+from supabase import Client
+from app.api.deps import get_supabase_client
 from app.schemas.job import JobCreate, JobUpdate, Job
 from app.schemas.application import ApplicationCreate, Application
 from app.services.job_service import job_service
@@ -42,12 +44,12 @@ def read_job(job_id: UUID):
     return job
 
 @router.patch("/{job_id}", response_model=Job)
-def update_job(job_id: UUID, job_in: JobUpdate):
+def update_job(job_id: UUID, job_in: JobUpdate, supabase_client: Client = Depends(get_supabase_client)):
     """
     Update a job (e.g., close it, change status).
     """
     try:
-        job = job_service.update_job(job_id, job_in)
+        job = job_service.update_job(job_id, job_in, client=supabase_client)
         if not job:
             raise HTTPException(status_code=404, detail="Job not found")
         return job
@@ -55,11 +57,11 @@ def update_job(job_id: UUID, job_in: JobUpdate):
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{job_id}")
-def delete_job(job_id: UUID):
+def delete_job(job_id: UUID, supabase_client: Client = Depends(get_supabase_client)):
     """
     Delete a job posting.
     """
-    success = job_service.delete_job(job_id)
+    success = job_service.delete_job(job_id, client=supabase_client)
     if not success:
         raise HTTPException(status_code=404, detail="Job not found or already deleted")
     return {"message": "Job deleted successfully"}

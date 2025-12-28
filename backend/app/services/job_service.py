@@ -21,11 +21,11 @@ class JobService:
     def get_job(self, job_id: UUID) -> Optional[Job]:
         return job_repository.get(job_id)
 
-    def update_job(self, job_id: UUID, job_in: JobUpdate) -> Optional[Job]:
-        return job_repository.update(job_id, job_in)
+    def update_job(self, job_id: UUID, job_in: JobUpdate, client=None) -> Optional[Job]:
+        return job_repository.update(job_id, job_in, client)
 
-    def delete_job(self, job_id: UUID) -> bool:
-        return job_repository.delete(job_id)
+    def delete_job(self, job_id: UUID, client=None) -> bool:
+        return job_repository.delete(job_id, client)
 
     def apply_to_job(self, application_in: ApplicationCreate) -> Application:
         # Business logic: Check if job exists, check if already applied?

@@ -71,6 +71,12 @@ class JobRepository(IBugSchoolRepository[Job, JobCreate, JobUpdate]):
     def delete(self, id: UUID, client=None) -> bool:
         db = client or supabase
         try:
+            # Delete related entities first (manual cascade)
+            db.table("applications").delete().eq("job_id", str(id)).execute()
+            db.table("reviews").delete().eq("job_id", str(id)).execute()
+            db.table("bookmarks").delete().eq("job_id", str(id)).execute()
+            
+            # Now delete the job
             response = db.table(self.table_name).delete().eq("id", str(id)).execute()
             return len(response.data) > 0
         except Exception as e:

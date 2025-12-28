@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Dict, Any
 from uuid import UUID
 from fastapi import APIRouter, HTTPException
 from app.schemas.user import UserCreate, UserUpdate, User
-from app.schemas.application import Application
+from app.schemas.application import Application, ApplicationWithDetails
 from app.services.auth_service import auth_service
 from app.repositories.user_repository import user_repository
 from app.repositories.application_repository import application_repository
@@ -49,4 +49,14 @@ def get_user_applications(user_id: UUID):
     """
     return application_repository.get_by_applicant(user_id)
 
-
+@router.get("/{user_id}/notifications")
+def get_user_notifications(user_id: UUID) -> Dict[str, List[ApplicationWithDetails]]:
+    """
+    Get notifications for a user:
+    - applications_on_your_gigs: applications received on gigs you created
+    - your_applications: status of gigs you applied to
+    """
+    return {
+        "applications_on_your_gigs": application_repository.get_for_creator_with_details(user_id),
+        "your_applications": application_repository.get_by_applicant_with_details(user_id)
+    }

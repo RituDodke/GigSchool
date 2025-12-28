@@ -50,6 +50,24 @@ export interface Application {
     created_at: string
 }
 
+export interface ApplicationWithDetails {
+    id: string
+    job_id: string
+    applicant_id: string
+    pitch: string
+    status: string
+    created_at: string
+    job_title?: string
+    job_creator_id?: string
+    applicant_username?: string
+    applicant_email?: string
+}
+
+export interface NotificationsResponse {
+    applications_on_your_gigs: ApplicationWithDetails[]
+    your_applications: ApplicationWithDetails[]
+}
+
 export const jobsApi = {
     getAll: async (groupId?: string) => {
         const params = groupId ? { group_id: groupId } : {}
@@ -104,6 +122,11 @@ export const jobsApi = {
 
     updateApplicationStatus: async (applicationId: string, status: 'ACCEPTED' | 'REJECTED') => {
         const response = await api.patch<Application>(`/jobs/applications/${applicationId}`, { status })
+        return response.data
+    },
+
+    getNotifications: async (userId: string) => {
+        const response = await api.get<NotificationsResponse>(`/auth/${userId}/notifications`)
         return response.data
     }
 }

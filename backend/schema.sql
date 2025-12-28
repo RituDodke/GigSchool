@@ -58,6 +58,9 @@ create policy "Creators can update own jobs"
   on public.jobs for update
   using ( auth.uid() = creator_id );
 
+create policy "Creators can delete own jobs"
+  on public.jobs for delete
+  using ( auth.uid() = creator_id );
 
 -- 3. APPLICATIONS Table
 -- Matches app/schemas/application.py

@@ -27,7 +27,7 @@ class JobRepository(IBugSchoolRepository[Job, JobCreate, JobUpdate]):
         try:
             response = supabase.table(self.table_name).select(
                 "*, users(id, email, username, avatar_url)"
-            ).order("created_at", desc=True).limit(50).execute()
+            ).eq("status", "OPEN").order("created_at", desc=True).limit(50).execute()
             return [self.model(**self._enrich_with_creator(item)) for item in response.data]
         except Exception as e:
             print(f"Error fetching all jobs: {e}")

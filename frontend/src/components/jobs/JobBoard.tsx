@@ -5,8 +5,10 @@ import { JobCard } from './JobCard'
 import { CreateJobModal } from './CreateJobModal'
 import { JobDetailModal } from './JobDetailModal'
 import { Loader2, Plus, Search, Briefcase } from 'lucide-react'
+import { useAuthStore } from '@/stores/authStore'
 
 export function JobBoard() {
+    const { user } = useAuthStore()
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [selectedJob, setSelectedJob] = useState<Job | null>(null)
     const [search, setSearch] = useState('')
@@ -15,6 +17,15 @@ export function JobBoard() {
         queryKey: ['jobs'],
         queryFn: () => jobsApi.getAll()
     })
+
+    // Get user's applications to check which jobs they've applied to
+    const { data: userApplications } = useQuery({
+        queryKey: ['myApplications', user?.id],
+        queryFn: () => jobsApi.getUserApplications(user!.id),
+        enabled: !!user,
+    })
+
+    const appliedJobIds = new Set(userApplications?.map(app => app.job_id) || [])
 
     const filteredJobs = jobs?.filter(job =>
         job.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -77,6 +88,7 @@ export function JobBoard() {
                                 job={job}
                                 onApply={() => setSelectedJob(job)}
                                 onClick={(job) => setSelectedJob(job)}
+                                hasApplied={appliedJobIds.has(job.id)}
                             />
                         </div>
                     ))}

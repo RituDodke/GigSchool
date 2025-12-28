@@ -54,20 +54,24 @@ export default function NotificationsPage() {
     }
 
     const ApplicationCard = ({ app, isCreatorView }: { app: ApplicationWithDetails, isCreatorView: boolean }) => (
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
             <div className="flex justify-between items-start mb-2">
                 <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 text-sm">{app.job_title || 'Unknown Gig'}</h4>
+                    <div className="flex items-center gap-1.5 mb-1">
+                        <Briefcase className="w-3.5 h-3.5 text-orange-500" />
+                        <span className="text-xs text-gray-500 uppercase tracking-wide">Gig</span>
+                    </div>
+                    <h4 className="font-semibold text-gray-900">{app.job_title || 'Unknown Gig'}</h4>
                     {isCreatorView && (
-                        <p className="text-xs text-gray-500">
-                            From: {app.applicant_username || app.applicant_email?.split('@')[0] || 'Anonymous'}
+                        <p className="text-xs text-gray-500 mt-1">
+                            Applicant: <span className="font-medium text-gray-700">{app.applicant_username || app.applicant_email?.split('@')[0] || 'Anonymous'}</span>
                         </p>
                     )}
                 </div>
                 {getStatusBadge(app.status)}
             </div>
 
-            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{app.pitch}</p>
+            <p className="text-sm text-gray-600 mb-2 line-clamp-2 italic">"{app.pitch}"</p>
 
             <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400">

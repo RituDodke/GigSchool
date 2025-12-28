@@ -1,10 +1,11 @@
 import { Job } from '@/api/jobs'
-import { Calendar, Tag, ArrowRight, User } from 'lucide-react'
+import { Calendar, Tag, ArrowRight, User, Check } from 'lucide-react'
 
 interface JobCardProps {
     job: Job
     onApply: (jobId: string) => void
     onClick?: (job: Job) => void
+    hasApplied?: boolean
 }
 
 const categoryColors: Record<string, string> = {
@@ -16,7 +17,7 @@ const categoryColors: Record<string, string> = {
     'other': 'bg-pink-100 text-pink-700',
 }
 
-export function JobCard({ job, onApply, onClick }: JobCardProps) {
+export function JobCard({ job, onApply, onClick, hasApplied }: JobCardProps) {
     const statusStyles: Record<string, string> = {
         'OPEN': 'tag-orange',
         'CLOSED': 'bg-gray-100 text-gray-700',
@@ -80,18 +81,24 @@ export function JobCard({ job, onApply, onClick }: JobCardProps) {
                     {new Date(job.created_at).toLocaleDateString()}
                 </div>
 
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onApply(job.id)
-                    }}
-                    className="flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors group/btn"
-                >
-                    Apply
-                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
-                </button>
+                {hasApplied ? (
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
+                        <Check className="w-4 h-4" />
+                        Applied
+                    </span>
+                ) : (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onApply(job.id)
+                        }}
+                        className="flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors group/btn"
+                    >
+                        Apply
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+                    </button>
+                )}
             </div>
         </div>
     )
 }
-

@@ -29,6 +29,15 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
         enabled: isCreator && !!job,
     })
 
+    // Check if current user already applied
+    const { data: userApplications } = useQuery({
+        queryKey: ['myApplications', user?.id],
+        queryFn: () => jobsApi.getUserApplications(user!.id),
+        enabled: !isCreator && !!user && !!job,
+    })
+
+    const hasAlreadyApplied = userApplications?.some(app => app.job_id === job?.id)
+
     const applyMutation = useMutation({
         mutationFn: () => jobsApi.apply(job!.id, user!.id, pitch),
         onSuccess: () => {
@@ -268,13 +277,19 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                         </div>
                     ) : (
                         <div className="flex gap-2">
-                            {!showApplyForm && job.status === 'OPEN' && (
-                                <button
-                                    onClick={() => setShowApplyForm(true)}
-                                    className="btn-primary"
-                                >
-                                    Apply Now
-                                </button>
+                            {hasAlreadyApplied ? (
+                                <span className="text-sm text-green-600 font-medium py-2">
+                                    ✓ Already Applied
+                                </span>
+                            ) : (
+                                !showApplyForm && job.status === 'OPEN' && (
+                                    <button
+                                        onClick={() => setShowApplyForm(true)}
+                                        className="btn-primary"
+                                    >
+                                        Apply Now
+                                    </button>
+                                )
                             )}
                             <button
                                 onClick={handleMessageCreator}

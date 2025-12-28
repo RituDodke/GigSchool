@@ -23,14 +23,26 @@ export const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    timeout: 30000, // 30 second timeout
 })
 
-// Add request interceptor for JWT token
-api.interceptors.request.use(async (config) => {
-    const { data } = await supabase.auth.getSession()
-    if (data.session?.access_token) {
-        config.headers.Authorization = `Bearer ${data.session.access_token}`
+// Cache the token to avoid blocking every request
+let cachedToken: string | null = null
+
+// Update cached token when auth state changes
+supabase.auth.onAuthStateChange((_event, session) => {
+    cachedToken = session?.access_token || null
+})
+
+// Initialize token from existing session
+supabase.auth.getSession().then(({ data }) => {
+    cachedToken = data.session?.access_token || null
+})
+
+// Add request interceptor for JWT token (synchronous now)
+api.interceptors.request.use((config) => {
+    if (cachedToken) {
+        config.headers.Authorization = `Bearer ${cachedToken}`
     }
     return config
 })
-

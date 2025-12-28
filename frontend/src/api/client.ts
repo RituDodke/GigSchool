@@ -1,9 +1,20 @@
 import axios from 'axios'
 
-// Use the same host as the frontend, but port 8000 for the backend
+// Use environment variable if set, otherwise use Render backend URL
 const getBaseUrl = () => {
-    const host = window.location.hostname
-    return `http://${host}:8000/api/v1`
+    // In production (Vercel), use the Render backend
+    // In development, use localhost
+    if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL
+    }
+
+    // Check if we're in production (deployed)
+    if (window.location.hostname !== 'localhost') {
+        return 'https://gigschool.onrender.com/api/v1'
+    }
+
+    // Local development
+    return 'http://localhost:8000/api/v1'
 }
 
 export const api = axios.create({
@@ -15,3 +26,4 @@ export const api = axios.create({
 
 // TODO: Add request interceptor for JWT token
 // api.interceptors.request.use((config) => { ... })
+

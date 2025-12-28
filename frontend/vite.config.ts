@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     host: true, // Expose on network
     port: 5173,
+    allowedHosts: ['unoperating-ellen-nival.ngrok-free.dev', '.ngrok-free.app', '.ngrok.io'],
   },
   resolve: {
     alias: {

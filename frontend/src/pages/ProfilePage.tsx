@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { usersApi } from '@/api/users'
 import { jobsApi, Job, Application } from '@/api/jobs'
 import { supabase } from '@/lib/supabase'
+import { JobDetailModal } from '@/components/jobs/JobDetailModal'
 import { User, Mail, Calendar, Edit2, Camera, Loader2, Check, X, Briefcase, Send, Eye } from 'lucide-react'
 
 export default function ProfilePage() {
@@ -13,6 +14,7 @@ export default function ProfilePage() {
     const [isUploading, setIsUploading] = useState(false)
     const [username, setUsername] = useState(profile?.username || '')
     const [activeTab, setActiveTab] = useState<'gigs' | 'applications'>('gigs')
+    const [selectedGig, setSelectedGig] = useState<Job | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     // Fetch user's posted gigs
@@ -207,7 +209,10 @@ export default function ProfilePage() {
                                             <span className={`tag text-xs ${gig.status === 'OPEN' ? 'tag-orange' : gig.status === 'COMPLETED' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
                                                 {gig.status}
                                             </span>
-                                            <button className="btn-secondary text-sm flex items-center gap-1">
+                                            <button
+                                                onClick={() => setSelectedGig(gig)}
+                                                className="btn-secondary text-sm flex items-center gap-1"
+                                            >
                                                 <Eye className="w-4 h-4" />
                                                 View
                                             </button>
@@ -232,8 +237,8 @@ export default function ProfilePage() {
                                                 <p className="text-xs text-gray-400 mt-1">{new Date(app.created_at).toLocaleDateString()}</p>
                                             </div>
                                             <span className={`tag text-xs ${app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                                                    app.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
-                                                        'bg-red-50 text-red-700'
+                                                app.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
+                                                    'bg-red-50 text-red-700'
                                                 }`}>{app.status}</span>
                                         </div>
                                     </div>
@@ -248,6 +253,12 @@ export default function ProfilePage() {
                     )}
                 </div>
             </div>
+
+            <JobDetailModal
+                job={selectedGig}
+                isOpen={!!selectedGig}
+                onClose={() => setSelectedGig(null)}
+            />
         </div>
     )
 }

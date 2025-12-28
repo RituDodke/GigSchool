@@ -16,7 +16,8 @@ export function CreateJobModal({ isOpen, onClose }: CreateJobModalProps) {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [tags, setTags] = useState('')
-    const [groupId, setGroupId] = useState('general')
+    const [category, setCategory] = useState('general')
+    const [resumeRequired, setResumeRequired] = useState(false)
 
     const createJobMutation = useMutation({
         mutationFn: jobsApi.create,
@@ -26,6 +27,8 @@ export function CreateJobModal({ isOpen, onClose }: CreateJobModalProps) {
             setTitle('')
             setDescription('')
             setTags('')
+            setCategory('general')
+            setResumeRequired(false)
         }
     })
 
@@ -37,7 +40,9 @@ export function CreateJobModal({ isOpen, onClose }: CreateJobModalProps) {
             title,
             description,
             tags: tags.split(',').map(t => t.trim()).filter(Boolean),
-            group_id: groupId,
+            category,
+            resume_required: resumeRequired,
+            group_id: 'general',
             creator_id: user.id
         })
     }
@@ -112,8 +117,8 @@ export function CreateJobModal({ isOpen, onClose }: CreateJobModalProps) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
                             <select
-                                value={groupId}
-                                onChange={e => setGroupId(e.target.value)}
+                                value={category}
+                                onChange={e => setCategory(e.target.value)}
                                 className="input-clean"
                             >
                                 <option value="general">General</option>
@@ -124,6 +129,19 @@ export function CreateJobModal({ isOpen, onClose }: CreateJobModalProps) {
                                 <option value="other">Other</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 py-2">
+                        <input
+                            type="checkbox"
+                            id="resumeRequired"
+                            checked={resumeRequired}
+                            onChange={e => setResumeRequired(e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                        />
+                        <label htmlFor="resumeRequired" className="text-sm text-gray-700">
+                            Require resume/portfolio from applicants
+                        </label>
                     </div>
 
                     <div className="flex gap-3 pt-4">

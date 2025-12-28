@@ -1,20 +1,35 @@
 import { Job } from '@/api/jobs'
-import { Calendar, Tag, ArrowRight } from 'lucide-react'
+import { Calendar, Tag, ArrowRight, User } from 'lucide-react'
 
 interface JobCardProps {
     job: Job
     onApply: (jobId: string) => void
+    onClick?: (job: Job) => void
 }
 
-export function JobCard({ job, onApply }: JobCardProps) {
+const categoryColors: Record<string, string> = {
+    'general': 'bg-gray-100 text-gray-700',
+    'tutoring': 'bg-blue-100 text-blue-700',
+    'design': 'bg-purple-100 text-purple-700',
+    'coding': 'bg-green-100 text-green-700',
+    'writing': 'bg-yellow-100 text-yellow-700',
+    'other': 'bg-pink-100 text-pink-700',
+}
+
+export function JobCard({ job, onApply, onClick }: JobCardProps) {
     const statusStyles: Record<string, string> = {
         'OPEN': 'tag-orange',
-        'IN_PROGRESS': 'bg-blue-50 text-blue-700',
+        'CLOSED': 'bg-gray-100 text-gray-700',
         'COMPLETED': 'bg-green-50 text-green-700',
     }
 
+    const creatorName = job.creator?.username || job.creator?.email?.split('@')[0] || 'Anonymous'
+
     return (
-        <div className="card p-5 hover:shadow-md transition-shadow duration-200 cursor-pointer group">
+        <div
+            className="card p-5 hover:shadow-md transition-shadow duration-200 cursor-pointer group"
+            onClick={() => onClick?.(job)}
+        >
             {/* Header */}
             <div className="flex justify-between items-start mb-3">
                 <h3 className="font-semibold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-1">
@@ -22,6 +37,21 @@ export function JobCard({ job, onApply }: JobCardProps) {
                 </h3>
                 <span className={`tag flex-shrink-0 ml-2 ${statusStyles[job.status] || 'tag'}`}>
                     {job.status}
+                </span>
+            </div>
+
+            {/* Creator Info */}
+            <div className="flex items-center gap-2 mb-3">
+                {job.creator?.avatar_url ? (
+                    <img src={job.creator.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                        <User className="w-3 h-3 text-gray-500" />
+                    </div>
+                )}
+                <span className="text-sm text-gray-600">{creatorName}</span>
+                <span className={`tag text-xs ${categoryColors[job.category] || categoryColors.general}`}>
+                    {job.category}
                 </span>
             </div>
 
@@ -64,3 +94,4 @@ export function JobCard({ job, onApply }: JobCardProps) {
         </div>
     )
 }
+

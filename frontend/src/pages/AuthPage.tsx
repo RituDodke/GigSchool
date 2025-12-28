@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
-import { Loader2, ArrowRight, Briefcase } from 'lucide-react'
+import { Loader2, ArrowRight, Briefcase, User } from 'lucide-react'
 
 export default function AuthPage() {
     const navigate = useNavigate()
@@ -11,6 +11,7 @@ export default function AuthPage() {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [username, setUsername] = useState('')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -20,7 +21,7 @@ export default function AuthPage() {
                 await signInWithEmail(email, password)
                 navigate('/')
             } else {
-                await signUpWithEmail(email, password)
+                await signUpWithEmail(email, password, username)
                 alert('Check your email for confirmation!')
             }
         } catch (error: any) {
@@ -57,6 +58,23 @@ export default function AuthPage() {
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        {!isLogin && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        required={!isLogin}
+                                        className="input-clean pl-10"
+                                        placeholder="johndoe"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                             <input
@@ -123,3 +141,4 @@ export default function AuthPage() {
         </div>
     )
 }
+

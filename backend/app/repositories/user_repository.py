@@ -34,6 +34,19 @@ class IBugSchoolRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType
         except Exception as e:
             raise e
 
+    def update(self, id: UUID, obj_in: UpdateSchemaType) -> Optional[ModelType]:
+        obj_data = jsonable_encoder(obj_in, exclude_unset=True)
+        # Remove None values
+        obj_data = {k: v for k, v in obj_data.items() if v is not None}
+        try:
+            response = supabase.table(self.table_name).update(obj_data).eq("id", str(id)).execute()
+            if response.data:
+                return self.model(**response.data[0])
+            return None
+        except Exception as e:
+            print(f"Error updating {self.table_name}: {e}")
+            raise e
+
 class UserRepository(IBugSchoolRepository):
     def get_by_email(self, email: str) -> Optional[ModelType]:
         try:
@@ -44,7 +57,17 @@ class UserRepository(IBugSchoolRepository):
         except Exception:
             return None
 
+    def get_all(self) -> List[ModelType]:
+        try:
+            response = supabase.table(self.table_name).select("*").execute()
+            if response.data:
+                return [self.model(**item) for item in response.data]
+            return []
+        except Exception:
+            return []
+
 # Instantiate
 from app.schemas.user import User, UserCreate, UserUpdate
 
 user_repository = UserRepository(User, "users")
+

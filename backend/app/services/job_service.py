@@ -1,6 +1,6 @@
 from typing import List, Optional
 from uuid import UUID
-from app.schemas.job import JobCreate, Job
+from app.schemas.job import JobCreate, JobUpdate, Job
 from app.schemas.application import ApplicationCreate, Application
 from app.repositories.job_repository import job_repository
 from app.repositories.application_repository import application_repository
@@ -18,6 +18,12 @@ class JobService:
     def get_job(self, job_id: UUID) -> Optional[Job]:
         return job_repository.get(job_id)
 
+    def update_job(self, job_id: UUID, job_in: JobUpdate) -> Optional[Job]:
+        return job_repository.update(job_id, job_in)
+
+    def delete_job(self, job_id: UUID) -> bool:
+        return job_repository.delete(job_id)
+
     def apply_to_job(self, application_in: ApplicationCreate) -> Application:
         # Business logic: Check if job exists, check if already applied?
         # For now, just create.
@@ -27,3 +33,4 @@ class JobService:
         return application_repository.get_by_job(job_id)
 
 job_service = JobService()
+

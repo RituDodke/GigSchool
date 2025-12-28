@@ -5,12 +5,16 @@ from pydantic import BaseModel, EmailStr, Field
 
 class UserBase(BaseModel):
     email: EmailStr
+    username: Optional[str] = None
+    avatar_url: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 class UserCreate(UserBase):
     id: UUID # We receive the ID from Supabase Auth
     
 class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    avatar_url: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
 class UserInDBBase(UserBase):
@@ -22,3 +26,4 @@ class UserInDBBase(UserBase):
 
 class User(UserInDBBase):
     pass
+

@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
-from app.schemas.user import UserCreate, User
+from uuid import UUID
+from fastapi import APIRouter, HTTPException
+from app.schemas.user import UserCreate, UserUpdate, User
 from app.services.auth_service import auth_service
+from app.repositories.user_repository import user_repository
 
 router = APIRouter()
 
@@ -14,11 +16,26 @@ def sync_user(user_in: UserCreate):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/me", response_model=User)
-def read_users_me():
+@router.get("/{user_id}", response_model=User)
+def get_user(user_id: UUID):
     """
-    Get current user.
+    Get a user by ID.
     """
-    # In a real app, we would extract the ID from the JWT token dependencies.
-    # For scaffolding, we return a placeholder error implementation or mock.
-    raise HTTPException(status_code=501, detail="Not implemented yet. Needs JWT dep.")
+    user = user_repository.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@router.patch("/{user_id}", response_model=User)
+def update_user(user_id: UUID, user_in: UserUpdate):
+    """
+    Update user profile (username, avatar_url).
+    """
+    try:
+        user = user_repository.update(user_id, user_in)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+

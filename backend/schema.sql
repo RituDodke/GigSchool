@@ -6,6 +6,8 @@ create extension if not exists "uuid-ossp";
 create table public.users (
   id uuid primary key references auth.users(id), -- Linked to Supabase Auth
   email text not null,
+  username text,
+  avatar_url text,
   metadata jsonb default '{}'::jsonb,
   created_at timestamptz default now()
 );
@@ -27,10 +29,12 @@ create policy "Users can read own profile"
 create table public.jobs (
   id uuid primary key default uuid_generate_v4(),
   creator_id uuid references public.users(id) not null,
-  group_id text not null, -- e.g. "college-engineering"
+  group_id text not null default 'general', -- e.g. "college-engineering"
   title text not null,
   description text not null,
   tags text[] default '{}',
+  category text default 'general', -- general, tutoring, design, coding, writing, other
+  resume_required boolean default false,
   status text default 'OPEN', -- OPEN, CLOSED, COMPLETED
   payload jsonb default '{}'::jsonb,
   created_at timestamptz default now()

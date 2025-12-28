@@ -3,10 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import { jobsApi, Job } from '@/api/jobs'
 import { JobCard } from './JobCard'
 import { CreateJobModal } from './CreateJobModal'
+import { JobDetailModal } from './JobDetailModal'
 import { Loader2, Plus, Search, Briefcase } from 'lucide-react'
 
 export function JobBoard() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+    const [selectedJob, setSelectedJob] = useState<Job | null>(null)
     const [search, setSearch] = useState('')
 
     const { data: jobs, isLoading, error } = useQuery<Job[]>({
@@ -73,7 +75,8 @@ export function JobBoard() {
                         >
                             <JobCard
                                 job={job}
-                                onApply={(id) => console.log('Apply to', id)}
+                                onApply={() => setSelectedJob(job)}
+                                onClick={(job) => setSelectedJob(job)}
                             />
                         </div>
                     ))}
@@ -101,6 +104,13 @@ export function JobBoard() {
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
             />
+
+            <JobDetailModal
+                job={selectedJob}
+                isOpen={!!selectedJob}
+                onClose={() => setSelectedJob(null)}
+            />
         </div>
     )
 }
+

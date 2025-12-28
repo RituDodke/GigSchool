@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { StarRating } from './StarRating'
 import { Loader2, X } from 'lucide-react'
-import { reviewsApi, ReviewCreate } from '@/api/reviews'
+import { reviewsApi } from '@/api/reviews'
 
 interface CreateReviewModalProps {
     jobId: string

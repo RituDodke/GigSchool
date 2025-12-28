@@ -9,7 +9,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { PortfolioGrid } from '@/components/portfolio/PortfolioGrid'
 import { ReviewList } from '@/components/reviews/ReviewList'
 import { StarRating } from '@/components/reviews/StarRating'
-import { Loader2, Calendar, Mail, AlertCircle, MessageCircle } from 'lucide-react'
+import { Loader2, Calendar, AlertCircle, MessageCircle } from 'lucide-react'
 
 export default function PublicProfilePage() {
     const { userId } = useParams<{ userId: string }>()

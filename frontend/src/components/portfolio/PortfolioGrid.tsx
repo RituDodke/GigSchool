@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { PortfolioItem, portfolioApi } from '@/api/portfolio'
-import { useAuthStore } from '@/stores/authStore'
+
 import { Trash2, ExternalLink, FileText, X, Eye } from 'lucide-react'
 
 interface PortfolioGridProps {
@@ -10,7 +10,19 @@ interface PortfolioGridProps {
 }
 
 export function PortfolioGrid({ items, isOwner }: PortfolioGridProps) {
-    const { user } = useAuthStore()
+    // const { user } = useAuthStore() (REMOVED)
+    // Actually simpler to just remove the line if unused.
+    // But `useAuthStore` might be needed if I removed `user`.
+    // Wait, line 4 imports `useAuthStore`.
+    // Line 13 uses it.
+    // If I remove line 13, I might need to remove import too if `useAuthStore` is not used elsewhere.
+    // Let's check if `useAuthStore` is used.
+    // It is imported on line 4. And used on line 13.
+    // If I remove `const { user } = useAuthStore()`, then `useAuthStore` import might be unused.
+    // I should check if `useAuthStore` is used elsewhere.
+    // Looking at the file content: `useAuthStore` is only used on line 13.
+    // So I should remove line 13 AND line 4.
+
     const queryClient = useQueryClient()
     const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null)
 

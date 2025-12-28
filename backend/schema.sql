@@ -90,3 +90,62 @@ create policy "Applicants can create applications"
 -- but the Frontend (User Client) needs these policies if using Supabase client directly.
 -- Since we use Python Backend as a proxy, the Backend usually holds the "Power".
 -- However, maintaining RLS is good practice.
+
+-- 4. CONVERSATIONS Table (DMs between two users)
+create table public.conversations (
+  id uuid primary key default uuid_generate_v4(),
+  user1_id uuid references public.users(id) not null,
+  user2_id uuid references public.users(id) not null,
+  last_message_at timestamptz default now(),
+  created_at timestamptz default now(),
+  UNIQUE(user1_id, user2_id)
+);
+
+-- Enable RLS for Conversations
+alter table public.conversations enable row level security;
+
+-- Policy: Users can see their own conversations
+create policy "Users can see own conversations"
+  on public.conversations for select
+  using ( auth.uid() = user1_id OR auth.uid() = user2_id );
+
+-- Policy: Users can create conversations with others
+create policy "Users can create conversations"
+  on public.conversations for insert
+  with check ( auth.uid() = user1_id OR auth.uid() = user2_id );
+
+-- 5. MESSAGES Table
+create table public.messages (
+  id uuid primary key default uuid_generate_v4(),
+  conversation_id uuid references public.conversations(id) on delete cascade not null,
+  sender_id uuid references public.users(id) not null,
+  content text not null,
+  created_at timestamptz default now()
+);
+
+-- Enable RLS for Messages
+alter table public.messages enable row level security;
+
+-- Policy: Users can see messages in their conversations
+create policy "Users can see messages in own conversations"
+  on public.messages for select
+  using (
+    exists (
+      select 1 from public.conversations c
+      where c.id = conversation_id
+      and (c.user1_id = auth.uid() OR c.user2_id = auth.uid())
+    )
+  );
+
+-- Policy: Users can send messages to their conversations
+create policy "Users can send messages"
+  on public.messages for insert
+  with check (
+    auth.uid() = sender_id
+    and exists (
+      select 1 from public.conversations c
+      where c.id = conversation_id
+      and (c.user1_id = auth.uid() OR c.user2_id = auth.uid())
+    )
+  );
+

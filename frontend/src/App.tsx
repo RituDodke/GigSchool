@@ -4,10 +4,11 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, Link } from 'react
 import AuthPage from '@/pages/AuthPage'
 import ProfilePage from '@/pages/ProfilePage'
 import SettingsPage from '@/pages/SettingsPage'
+import ChatPage from '@/pages/ChatPage'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuthStore } from '@/stores/authStore'
 import { JobBoard } from '@/components/jobs/JobBoard'
-import { LogOut, Briefcase, Home, User, Settings } from 'lucide-react'
+import { LogOut, Briefcase, Home, User, Settings, MessageCircle } from 'lucide-react'
 
 const queryClient = new QueryClient()
 
@@ -32,6 +33,10 @@ function Sidebar() {
         <Link to="/" className={`sidebar-link ${isActive('/') ? 'active' : ''}`}>
           <Home className="w-5 h-5" />
           <span>Dashboard</span>
+        </Link>
+        <Link to="/chat" className={`sidebar-link ${isActive('/chat') ? 'active' : ''}`}>
+          <MessageCircle className="w-5 h-5" />
+          <span>Messages</span>
         </Link>
         <Link to="/profile" className={`sidebar-link ${isActive('/profile') ? 'active' : ''}`}>
           <User className="w-5 h-5" />
@@ -107,6 +112,13 @@ function App() {
             <ProtectedRoute>
               <DashboardLayout title="Settings" subtitle="Customize your experience">
                 <SettingsPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <DashboardLayout title="Messages" subtitle="Chat with other users">
+                <ChatPage />
               </DashboardLayout>
             </ProtectedRoute>
           } />

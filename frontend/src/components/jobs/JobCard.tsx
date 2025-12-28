@@ -1,5 +1,5 @@
 import { Job } from '@/api/jobs'
-import { Calendar, Tag, User, ArrowRight } from 'lucide-react'
+import { Calendar, Tag, ArrowRight } from 'lucide-react'
 
 interface JobCardProps {
     job: Job

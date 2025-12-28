@@ -33,6 +33,16 @@ class JobRepository(IBugSchoolRepository[Job, JobCreate, JobUpdate]):
             print(f"Error fetching all jobs: {e}")
             return []
 
+    def get_by_creator(self, creator_id: str) -> List[Job]:
+        try:
+            response = supabase.table(self.table_name).select(
+                "*, users(id, email, username, avatar_url)"
+            ).eq("creator_id", creator_id).order("created_at", desc=True).execute()
+            return [self.model(**self._enrich_with_creator(item)) for item in response.data]
+        except Exception as e:
+            print(f"Error fetching jobs for creator {creator_id}: {e}")
+            return []
+
     def get(self, id: UUID) -> Optional[Job]:
         try:
             response = supabase.table(self.table_name).select(

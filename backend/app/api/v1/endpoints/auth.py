@@ -1,8 +1,11 @@
+from typing import List
 from uuid import UUID
 from fastapi import APIRouter, HTTPException
 from app.schemas.user import UserCreate, UserUpdate, User
+from app.schemas.application import Application
 from app.services.auth_service import auth_service
 from app.repositories.user_repository import user_repository
+from app.repositories.application_repository import application_repository
 
 router = APIRouter()
 
@@ -38,4 +41,12 @@ def update_user(user_id: UUID, user_in: UserUpdate):
         return user
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/{user_id}/applications", response_model=List[Application])
+def get_user_applications(user_id: UUID):
+    """
+    Get all applications submitted by a user.
+    """
+    return application_repository.get_by_applicant(user_id)
+
 

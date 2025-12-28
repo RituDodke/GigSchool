@@ -13,4 +13,13 @@ class ApplicationRepository(IBugSchoolRepository[Application, ApplicationCreate,
             print(f"Error fetching applications for job {job_id}: {e}")
             return []
 
+    def get_by_applicant(self, applicant_id: UUID) -> List[Application]:
+        try:
+            response = supabase.table(self.table_name).select("*").eq("applicant_id", str(applicant_id)).order("created_at", desc=True).execute()
+            return [self.model(**item) for item in response.data]
+        except Exception as e:
+            print(f"Error fetching applications for applicant {applicant_id}: {e}")
+            return []
+
 application_repository = ApplicationRepository(Application, "applications")
+

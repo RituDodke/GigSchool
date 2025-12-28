@@ -18,10 +18,15 @@ def create_job(job_in: JobCreate):
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/", response_model=List[Job])
-def read_jobs(group_id: Optional[str] = Query(None, description="Group ID to filter by")):
+def read_jobs(
+    group_id: Optional[str] = Query(None, description="Group ID to filter by"),
+    creator_id: Optional[str] = Query(None, description="Creator ID to filter by")
+):
     """
-    Get all jobs. Filter by group if provided.
+    Get all jobs. Filter by group or creator if provided.
     """
+    if creator_id:
+        return job_service.get_jobs_by_creator(creator_id)
     if group_id:
         return job_service.get_jobs_by_group(group_id)
     return job_service.get_all_jobs()

@@ -57,6 +57,11 @@ export const jobsApi = {
         return response.data
     },
 
+    getByCreator: async (creatorId: string) => {
+        const response = await api.get<Job[]>('/jobs/', { params: { creator_id: creatorId } })
+        return response.data
+    },
+
     create: async (data: CreateJobData) => {
         const response = await api.post<Job>('/jobs/', data)
         return response.data
@@ -89,6 +94,11 @@ export const jobsApi = {
 
     getApplications: async (jobId: string) => {
         const response = await api.get<Application[]>(`/jobs/${jobId}/applications`)
+        return response.data
+    },
+
+    getUserApplications: async (userId: string) => {
+        const response = await api.get<Application[]>(`/auth/${userId}/applications`)
         return response.data
     }
 }

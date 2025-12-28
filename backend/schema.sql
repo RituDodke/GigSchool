@@ -81,6 +81,17 @@ create policy "Applicants can see own applications"
   on public.applications for select
   using ( auth.uid() = applicant_id );
 
+-- Policy: Job creators can see applications for their jobs
+create policy "Creators can see applications for own jobs"
+  on public.applications for select
+  using (
+    exists (
+      select 1 from public.jobs j
+      where j.id = job_id
+      and j.creator_id = auth.uid()
+    )
+  );
+
 create policy "Applicants can create applications"
   on public.applications for insert
   with check ( auth.uid() = applicant_id );

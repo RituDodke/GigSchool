@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Job, jobsApi, Application } from '@/api/jobs'
+import { chatApi } from '@/api/chat'
 import { useAuthStore } from '@/stores/authStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { X, User, Calendar, Tag, Trash2, CheckCircle, Loader2, Send, FileText, MessageCircle } from 'lucide-react'
@@ -13,8 +15,10 @@ interface JobDetailModalProps {
 export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
     const { user } = useAuthStore()
     const queryClient = useQueryClient()
+    const navigate = useNavigate()
     const [pitch, setPitch] = useState('')
     const [showApplyForm, setShowApplyForm] = useState(false)
+    const [isStartingChat, setIsStartingChat] = useState(false)
 
     const isCreator = user?.id === job?.creator_id
 
@@ -30,9 +34,11 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
         onSuccess: () => {
             setPitch('')
             setShowApplyForm(false)
+            queryClient.invalidateQueries({ queryKey: ['applications', job?.id] })
             alert('Application submitted successfully!')
         },
         onError: (err: any) => {
+            console.error('Apply error:', err)
             alert(err.response?.data?.detail || 'Failed to apply')
         }
     })
@@ -51,6 +57,21 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
             queryClient.invalidateQueries({ queryKey: ['jobs'] })
         }
     })
+
+    const handleMessageCreator = async () => {
+        if (!user || !job?.creator_id) return
+        setIsStartingChat(true)
+        try {
+            await chatApi.getOrCreateConversation(user.id, job.creator_id)
+            onClose()
+            navigate('/chat')
+        } catch (err) {
+            console.error('Failed to start chat:', err)
+            alert('Failed to start chat. Please try again.')
+        } finally {
+            setIsStartingChat(false)
+        }
+    }
 
     if (!isOpen || !job) return null
 
@@ -138,8 +159,8 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                                         <div className="flex justify-between items-start">
                                             <p className="text-sm text-gray-700">{app.pitch}</p>
                                             <span className={`tag text-xs ${app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                                                    app.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
-                                                        'bg-red-50 text-red-700'
+                                                app.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
+                                                    'bg-red-50 text-red-700'
                                                 }`}>{app.status}</span>
                                         </div>
                                         <p className="text-xs text-gray-400 mt-1">
@@ -220,8 +241,16 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                                     Apply Now
                                 </button>
                             )}
-                            <button className="btn-secondary flex items-center gap-2">
-                                <MessageCircle className="w-4 h-4" />
+                            <button
+                                onClick={handleMessageCreator}
+                                disabled={isStartingChat}
+                                className="btn-secondary flex items-center gap-2"
+                            >
+                                {isStartingChat ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <MessageCircle className="w-4 h-4" />
+                                )}
                                 Message Creator
                             </button>
                         </div>
@@ -234,3 +263,4 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
         </div>
     )
 }
+

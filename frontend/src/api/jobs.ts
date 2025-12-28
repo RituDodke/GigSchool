@@ -100,6 +100,11 @@ export const jobsApi = {
     getUserApplications: async (userId: string) => {
         const response = await api.get<Application[]>(`/auth/${userId}/applications`)
         return response.data
+    },
+
+    updateApplicationStatus: async (applicationId: string, status: 'ACCEPTED' | 'REJECTED') => {
+        const response = await api.patch<Application>(`/jobs/applications/${applicationId}`, { status })
+        return response.data
     }
 }
 

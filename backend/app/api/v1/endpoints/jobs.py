@@ -84,3 +84,17 @@ def read_job_applications(job_id: UUID):
     """
     return job_service.get_job_applications(job_id)
 
+@router.patch("/applications/{application_id}", response_model=Application)
+def update_application_status(application_id: UUID, status_update: dict):
+    """
+    Update application status (ACCEPTED/REJECTED).
+    """
+    try:
+        status = status_update.get("status")
+        if status not in ["ACCEPTED", "REJECTED"]:
+            raise HTTPException(status_code=400, detail="Invalid status")
+        return job_service.update_application_status(application_id, status)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+

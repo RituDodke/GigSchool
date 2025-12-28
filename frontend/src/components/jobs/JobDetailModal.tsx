@@ -58,6 +58,17 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
         }
     })
 
+    const updateApplicationStatusMutation = useMutation({
+        mutationFn: ({ appId, status }: { appId: string, status: 'ACCEPTED' | 'REJECTED' }) =>
+            jobsApi.updateApplicationStatus(appId, status),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['applications', job?.id] })
+        },
+        onError: (err: any) => {
+            alert(err.response?.data?.detail || 'Failed to update application status')
+        }
+    })
+
     const handleMessageCreator = async () => {
         if (!user || !job?.creator_id) return
         setIsStartingChat(true)
@@ -157,15 +168,39 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                                 {applications.map((app: Application) => (
                                     <div key={app.id} className="p-3 bg-gray-50 rounded-lg">
                                         <div className="flex justify-between items-start">
-                                            <p className="text-sm text-gray-700">{app.pitch}</p>
-                                            <span className={`tag text-xs ${app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                                                app.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
-                                                    'bg-red-50 text-red-700'
-                                                }`}>{app.status}</span>
+                                            <div>
+                                                <p className="text-sm text-gray-700 mb-1">{app.pitch}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`tag text-xs ${app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
+                                                        app.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
+                                                            'bg-red-50 text-red-700'
+                                                        }`}>{app.status}</span>
+                                                    <span className="text-xs text-gray-400">
+                                                        {new Date(app.created_at).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {app.status === 'PENDING' && (
+                                                <div className="flex gap-1">
+                                                    <button
+                                                        onClick={() => updateApplicationStatusMutation.mutate({ appId: app.id, status: 'ACCEPTED' })}
+                                                        disabled={updateApplicationStatusMutation.isPending}
+                                                        className="p-1 hover:bg-green-100 rounded text-green-600"
+                                                        title="Accept"
+                                                    >
+                                                        <CheckCircle className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updateApplicationStatusMutation.mutate({ appId: app.id, status: 'REJECTED' })}
+                                                        disabled={updateApplicationStatusMutation.isPending}
+                                                        className="p-1 hover:bg-red-100 rounded text-red-600"
+                                                        title="Reject"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
-                                        <p className="text-xs text-gray-400 mt-1">
-                                            {new Date(app.created_at).toLocaleDateString()}
-                                        </p>
                                     </div>
                                 ))}
                             </div>

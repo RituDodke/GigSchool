@@ -21,5 +21,15 @@ class ApplicationRepository(IBugSchoolRepository[Application, ApplicationCreate,
             print(f"Error fetching applications for applicant {applicant_id}: {e}")
             return []
 
+    def update_status(self, application_id: UUID, status: str) -> Application:
+        try:
+            response = supabase.table(self.table_name).update({"status": status}).eq("id", str(application_id)).execute()
+            if response.data:
+                return self.model(**response.data[0])
+            raise Exception("Application not found")
+        except Exception as e:
+            print(f"Error updating application {application_id}: {e}")
+            raise e
+
 application_repository = ApplicationRepository(Application, "applications")
 

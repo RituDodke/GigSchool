@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, jobs, chat
+from app.api.v1.endpoints import auth, jobs, portfolio, chat, reviews
 
 api_router = APIRouter()
 
@@ -9,5 +9,6 @@ def api_health_check():
 
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
+api_router.include_router(portfolio.router, tags=["portfolio"])
 api_router.include_router(chat.router, prefix="/chat", tags=["chat"])
-
+api_router.include_router(reviews.router, prefix="/reviews", tags=["reviews"])

@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { useNavigate } from 'react-router-dom'
 import { Job, jobsApi, Application } from '@/api/jobs'
 import { chatApi } from '@/api/chat'
 import { useAuthStore } from '@/stores/authStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { X, User, Calendar, Tag, Trash2, CheckCircle, Loader2, Send, FileText, MessageCircle } from 'lucide-react'
+import { X, User, Calendar, Tag, Trash2, CheckCircle, Loader2, Send, FileText, MessageCircle, Star } from 'lucide-react'
+import { CreateReviewModal } from '@/components/reviews/CreateReviewModal'
 
 interface JobDetailModalProps {
     job: Job | null
@@ -20,6 +22,10 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
     const [showApplyForm, setShowApplyForm] = useState(false)
     const [isStartingChat, setIsStartingChat] = useState(false)
 
+    // Review State
+    const [showReviewModal, setShowReviewModal] = useState(false)
+    const [revieweeInfo, setRevieweeInfo] = useState<{ id: string, name: string } | null>(null)
+
     const isCreator = user?.id === job?.creator_id
 
     // Fetch applications if creator
@@ -28,6 +34,11 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
         queryFn: () => jobsApi.getApplications(job!.id),
         enabled: isCreator && !!job,
     })
+
+    const handleOpenReview = (userId: string, userName: string) => {
+        setRevieweeInfo({ id: userId, name: userName })
+        setShowReviewModal(true)
+    }
 
     // Check if current user already applied
     const { data: userApplications } = useQuery({
@@ -143,7 +154,9 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                     {/* Description */}
                     <div className="mb-6">
                         <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-                        <p className="text-gray-600 whitespace-pre-wrap">{job.description}</p>
+                        <div className="text-gray-600 dark:text-gray-300 prose dark:prose-invert max-w-none">
+                            <ReactMarkdown>{job.description}</ReactMarkdown>
+                        </div>
                     </div>
 
                     {/* Tags */}
@@ -167,7 +180,7 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                         Posted {new Date(job.created_at).toLocaleDateString()}
                     </div>
 
-                    {/* Applications (for creator) */}
+                    {/* Applications (for creator) with Review button */}
                     {isCreator && applications && applications.length > 0 && (
                         <div className="mb-6">
                             <h3 className="text-sm font-medium text-gray-700 mb-3">
@@ -187,6 +200,16 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                                                     <span className="text-xs text-gray-400">
                                                         {new Date(app.created_at).toLocaleDateString()}
                                                     </span>
+                                                    {/* Review Button for Creator */}
+                                                    {app.status === 'ACCEPTED' && job.status === 'COMPLETED' && (
+                                                        <button
+                                                            onClick={() => handleOpenReview(app.applicant_id, 'Applicant')}
+                                                            className="text-xs flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium ml-2"
+                                                        >
+                                                            <Star className="w-3 h-3" />
+                                                            Review Applicant
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                             {app.status === 'PENDING' && (
@@ -277,6 +300,17 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                         </div>
                     ) : (
                         <div className="flex gap-2">
+                            {/* Review Button for Applicant */}
+                            {hasAlreadyApplied && job.status === 'COMPLETED' && (
+                                <button
+                                    onClick={() => handleOpenReview(job.creator_id, creatorName)}
+                                    className="btn-primary flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 border-yellow-600"
+                                >
+                                    <Star className="w-4 h-4" />
+                                    Leave Review
+                                </button>
+                            )}
+
                             {hasAlreadyApplied ? (
                                 <span className="text-sm text-green-600 font-medium py-2">
                                     ✓ Already Applied
@@ -310,6 +344,20 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                     </button>
                 </div>
             </div>
+
+            {/* Review Modal */}
+            {revieweeInfo && (
+                <CreateReviewModal
+                    isOpen={showReviewModal}
+                    onClose={() => setShowReviewModal(false)}
+                    onSuccess={() => {
+                        // Optionally refresh queries 
+                    }}
+                    jobId={job.id}
+                    revieweeId={revieweeInfo.id}
+                    revieweeName={revieweeInfo.name}
+                />
+            )}
         </div>
     )
 }

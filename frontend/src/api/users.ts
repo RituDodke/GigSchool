@@ -5,6 +5,8 @@ export interface UserProfile {
     email: string
     username: string | null
     avatar_url: string | null
+    bio: string | null
+    skills: string[] | null
     metadata: Record<string, any>
     created_at: string
 }
@@ -12,6 +14,8 @@ export interface UserProfile {
 export interface UpdateUserData {
     username?: string
     avatar_url?: string
+    bio?: string
+    skills?: string[]
 }
 
 export const usersApi = {

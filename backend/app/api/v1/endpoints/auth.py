@@ -60,3 +60,29 @@ def get_user_notifications(user_id: UUID) -> Dict[str, List[ApplicationWithDetai
         "applications_on_your_gigs": application_repository.get_for_creator_with_details(user_id),
         "your_applications": application_repository.get_by_applicant_with_details(user_id)
     }
+
+# Bookmark endpoints
+from fastapi import Query
+from app.schemas.bookmark import Bookmark, BookmarkCreate
+from app.repositories.bookmark_repository import bookmark_repository
+
+@router.get("/{user_id}/bookmarks", response_model=List[Bookmark])
+def get_user_bookmarks(user_id: UUID):
+    """Get all bookmarks for a user."""
+    return bookmark_repository.get_by_user(user_id)
+
+@router.post("/{user_id}/bookmarks", response_model=Bookmark)
+def create_bookmark(user_id: UUID, job_id: UUID = Query(...)):
+    """Add a job to bookmarks."""
+    try:
+        bookmark_in = BookmarkCreate(user_id=user_id, job_id=job_id)
+        return bookmark_repository.create(bookmark_in)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/{user_id}/bookmarks/{job_id}")
+def delete_bookmark(user_id: UUID, job_id: UUID):
+    """Remove a job from bookmarks."""
+    if bookmark_repository.delete(user_id, job_id):
+        return {"status": "deleted"}
+    raise HTTPException(status_code=404, detail="Bookmark not found")

@@ -163,3 +163,27 @@ create policy "Users can send messages"
     )
   );
 
+-- 6. BOOKMARKS Table
+create table public.bookmarks (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references public.users(id) not null,
+  job_id uuid references public.jobs(id) not null,
+  created_at timestamptz default now(),
+  unique(user_id, job_id)
+);
+
+-- Enable RLS for Bookmarks
+alter table public.bookmarks enable row level security;
+
+-- Policy: Users can manage their own bookmarks
+create policy "Users can view own bookmarks"
+  on public.bookmarks for select
+  using ( auth.uid() = user_id );
+
+create policy "Users can create own bookmarks"
+  on public.bookmarks for insert
+  with check ( auth.uid() = user_id );
+
+create policy "Users can delete own bookmarks"
+  on public.bookmarks for delete
+  using ( auth.uid() = user_id );

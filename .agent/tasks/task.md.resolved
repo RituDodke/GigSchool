@@ -1,0 +1,35 @@
+# GigSchool Feature Expansion
+
+## Implementation Progress
+
+### Feature 1: Dark Mode ✅
+- [x] CSS variables and component styles (already in [index.css](file:///c:/new%20school%20project/gigschool/frontend/src/index.css))
+- [x] Theme store with localStorage persistence ([themeStore.ts](file:///c:/new%20school%20project/gigschool/frontend/src/stores/themeStore.ts))
+- [x] Toggle on Settings page ([SettingsPage.tsx](file:///c:/new%20school%20project/gigschool/frontend/src/pages/SettingsPage.tsx))
+- [x] Dark mode class application on `<html>` element
+
+### Feature 2: Bookmarks / Saved Gigs
+- [x] Backend: Bookmark endpoints in [auth.py](file:///c:/new%20school%20project/gigschool/backend/app/api/v1/endpoints/auth.py) (already existed)
+- [x] Backend: Endpoints registered in [api.py](file:///c:/new%20school%20project/gigschool/backend/app/api/v1/api.py) (already existed)
+- [x] Frontend: Bookmarks API in [jobs.ts](file:///c:/new%20school%20project/gigschool/frontend/src/api/jobs.ts) (already existed)
+- [x] Frontend: Integrate bookmarks in [JobBoard.tsx](file:///c:/new%20school%20project/gigschool/frontend/src/components/jobs/JobBoard.tsx)
+- [x] Frontend: Add "Saved" tab to [ProfilePage.tsx](file:///c:/new%20school%20project/gigschool/frontend/src/pages/ProfilePage.tsx)
+- [x] Verification: Manual testing of bookmark flow
+
+### Feature 3: Search Improvements ✅
+- [x] Add sort dropdown (Newest, Oldest)
+- [x] Add "Resume Required" filter
+
+### Feature 4: Rich Text Descriptions
+- [/] Install `react-markdown`
+- [ ] Update job description rendering
+
+### Feature 5: Rating System (Future)
+- [ ] Database schema
+- [ ] Backend endpoints
+- [ ] Frontend components
+
+### Feature 6: Profile Portfolios (Future)
+- [ ] Database schema
+- [ ] Supabase Storage integration
+- [ ] Frontend components

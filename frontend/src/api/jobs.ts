@@ -68,6 +68,13 @@ export interface NotificationsResponse {
     your_applications: ApplicationWithDetails[]
 }
 
+export interface Bookmark {
+    id: string
+    user_id: string
+    job_id: string
+    created_at: string
+}
+
 export const jobsApi = {
     getAll: async (groupId?: string) => {
         const params = groupId ? { group_id: groupId } : {}
@@ -128,6 +135,21 @@ export const jobsApi = {
     getNotifications: async (userId: string) => {
         const response = await api.get<NotificationsResponse>(`/auth/${userId}/notifications`)
         return response.data
+    },
+
+    // Bookmarks
+    getBookmarks: async (userId: string) => {
+        const response = await api.get<Bookmark[]>(`/auth/${userId}/bookmarks`)
+        return response.data
+    },
+
+    addBookmark: async (userId: string, jobId: string) => {
+        const response = await api.post<Bookmark>(`/auth/${userId}/bookmarks`, null, { params: { job_id: jobId } })
+        return response.data
+    },
+
+    removeBookmark: async (userId: string, jobId: string) => {
+        await api.delete(`/auth/${userId}/bookmarks/${jobId}`)
     }
 }
 

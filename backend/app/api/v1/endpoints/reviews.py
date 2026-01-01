@@ -1,30 +1,11 @@
 from typing import List, Any
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, Header
-from supabase import Client
-from app.api import deps
+from fastapi import APIRouter, Depends, HTTPException
+from app.api.deps import get_current_user
 from app.schemas.review import Review, ReviewCreate
 from app.repositories.review_repository import review_repository
 
 router = APIRouter()
-
-# Local dependency for get_current_user since it was missing in deps.py
-# In a real refactor, this should be moved to deps.py
-def get_current_user(
-    authorization: str = Header(...),
-    supabase: Client = Depends(deps.get_supabase_client)
-):
-    token = authorization.replace("Bearer ", "").strip()
-    if not token:
-        raise HTTPException(status_code=401, detail="Missing authentication token")
-    
-    try:
-        response = supabase.auth.get_user(token)
-        if not response or not response.user:
-             raise HTTPException(status_code=401, detail="Invalid authentication token")
-        return response.user
-    except Exception:
-        raise HTTPException(status_code=401, detail="Could not validate credentials")
 
 
 @router.post("/", response_model=Review)

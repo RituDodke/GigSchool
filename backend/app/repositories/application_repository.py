@@ -5,6 +5,17 @@ from app.schemas.application import Application, ApplicationCreate, ApplicationS
 from app.db.client import supabase
 
 class ApplicationRepository(IBugSchoolRepository[Application, ApplicationCreate, ApplicationStatusUpdate]):
+    def get(self, application_id: UUID) -> Application:
+        """Get a single application by ID"""
+        try:
+            response = supabase.table(self.table_name).select("*").eq("id", str(application_id)).single().execute()
+            if response.data:
+                return self.model(**response.data)
+            raise Exception("Application not found")
+        except Exception as e:
+            print(f"Error fetching application {application_id}: {e}")
+            raise e
+
     def get_by_job(self, job_id: UUID) -> List[Application]:
         try:
             response = supabase.table(self.table_name).select("*").eq("job_id", str(job_id)).execute()

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { StarRating } from './StarRating'
-import { Loader2, X } from 'lucide-react'
+import { Loader2, X, Star } from 'lucide-react'
 import { reviewsApi } from '@/api/reviews'
 
 interface CreateReviewModalProps {
@@ -52,66 +52,96 @@ export function CreateReviewModal({ jobId, revieweeId, revieweeName, isOpen, onC
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 animate-in zoom-in-95 duration-200">
-                <button
-                    onClick={onClose}
-                    className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                >
-                    <X className="w-5 h-5" />
-                </button>
+            {/* Backdrop with animation */}
+            <div
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-backdrop"
+                onClick={onClose}
+            />
 
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Review {revieweeName}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                    How was your experience working with {revieweeName}?
-                </p>
+            {/* Modal with animation */}
+            <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl animate-modal-in overflow-hidden">
+                {/* Header */}
+                <div className="relative px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+                    <button
+                        onClick={onClose}
+                        className="absolute right-4 top-4 p-2 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-150"
+                        aria-label="Close modal"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="flex flex-col items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Rating</label>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-yellow-50 dark:from-orange-900/40 dark:to-yellow-900/20 flex items-center justify-center">
+                            <Star className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                                Review {revieweeName}
+                            </h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Share your experience
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                    {/* Rating Section */}
+                    <div className="flex flex-col items-center gap-3 py-4 px-6 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                        <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            How was your experience?
+                        </label>
                         <StarRating
                             rating={rating}
                             maxRating={5}
-                            size={32}
+                            size={36}
                             interactive={true}
                             onRatingChange={setRating}
+                            showLabel={true}
                         />
                     </div>
 
+                    {/* Comment Section */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Comment (Optional)
+                            Comment <span className="text-gray-400 font-normal">(Optional)</span>
                         </label>
                         <textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            className="input-primary min-h-[100px] resize-none"
-                            placeholder="Share details about your experience..."
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition-all duration-200 min-h-[120px] resize-none"
+                            placeholder="Share details about your experience working together..."
                         />
                     </div>
 
+                    {/* Error State */}
                     {error && (
-                        <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-lg text-center">
+                        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 text-red-600 dark:text-red-400 text-sm rounded-xl">
+                            <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-bold">!</span>
+                            </div>
                             {error}
                         </div>
                     )}
 
-                    <div className="flex gap-3">
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-2">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="btn-secondary flex-1"
+                            className="btn-secondary flex-1 py-3"
                             disabled={isSubmitting}
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="btn-primary flex-1 flex justify-center items-center gap-2"
-                            disabled={isSubmitting}
+                            className="btn-primary flex-1 py-3 flex justify-center items-center gap-2"
+                            disabled={isSubmitting || rating === 0}
                         >
                             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                            Submit Review
+                            {isSubmitting ? 'Submitting...' : 'Submit Review'}
                         </button>
                     </div>
                 </form>

@@ -35,6 +35,9 @@ class JobService:
     def get_job_applications(self, job_id: UUID) -> List[Application]:
         return application_repository.get_by_job(job_id)
 
+    def get_application(self, application_id: UUID) -> Application:
+        return application_repository.get(application_id)
+
     def update_application_status(self, application_id: UUID, status: str) -> Application:
         return application_repository.update_status(application_id, status)
 

@@ -110,51 +110,76 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+            {/* Backdrop with blur */}
+            <div
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-backdrop"
+                onClick={onClose}
+            />
 
             {/* Modal */}
-            <div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-xl shadow-xl overflow-hidden animate-fade-in">
+            <div className="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-modal-in">
                 {/* Header */}
-                <div className="p-6 border-b border-gray-100">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/80">
                     <div className="flex justify-between items-start">
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-2">{job.title}</h2>
-                            <div className="flex items-center gap-3">
+                        <div className="flex-1 pr-8">
+                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{job.title}</h2>
+                            <div className="flex items-center gap-3 flex-wrap">
+                                {/* Creator info */}
                                 <div className="flex items-center gap-2">
                                     {job.creator?.avatar_url ? (
-                                        <img src={job.creator.avatar_url} alt="" className="w-6 h-6 rounded-full" />
+                                        <img src={job.creator.avatar_url} alt="" className="w-7 h-7 rounded-full ring-2 ring-white dark:ring-gray-700" />
                                     ) : (
-                                        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                                            <User className="w-4 h-4 text-gray-500" />
+                                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 flex items-center justify-center">
+                                            <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                         </div>
                                     )}
-                                    <span className="text-sm text-gray-600">{creatorName}</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">{creatorName}</span>
                                 </div>
-                                <span className={`tag ${job.status === 'OPEN' ? 'tag-orange' : 'bg-gray-100 text-gray-600'}`}>
+
+                                {/* Status badge */}
+                                <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${job.status === 'OPEN'
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                        : job.status === 'COMPLETED'
+                                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                                    }`}>
                                     {job.status}
                                 </span>
-                                <span className="tag bg-blue-50 text-blue-700">{job.category}</span>
+
+                                {/* Category badge */}
+                                <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                    {job.category}
+                                </span>
+
+                                {/* Resume required badge */}
                                 {job.resume_required && (
-                                    <span className="tag bg-purple-50 text-purple-700">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
                                         <FileText className="w-3 h-3" />
                                         Resume Required
                                     </span>
                                 )}
                             </div>
                         </div>
-                        <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600">
+
+                        {/* Close button */}
+                        <button
+                            onClick={onClose}
+                            className="p-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                        >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-6 overflow-y-auto max-h-[60vh]">
+                <div className="p-6 overflow-y-auto max-h-[55vh] modal-scrollbar">
                     {/* Description */}
                     <div className="mb-6">
-                        <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-                        <div className="text-gray-600 dark:text-gray-300 prose dark:prose-invert max-w-none">
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                            <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
+                            Description
+                        </h3>
+                        <div className="text-gray-600 dark:text-gray-300 prose dark:prose-invert max-w-none prose-p:my-2 prose-headings:mt-4 prose-headings:mb-2">
                             <ReactMarkdown>{job.description}</ReactMarkdown>
                         </div>
                     </div>
@@ -162,10 +187,13 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                     {/* Tags */}
                     {job.tags.length > 0 && (
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-gray-700 mb-2">Tags</h3>
+                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                                <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
+                                Tags
+                            </h3>
                             <div className="flex flex-wrap gap-2">
                                 {job.tags.map(tag => (
-                                    <span key={tag} className="tag">
+                                    <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
                                         <Tag className="w-3 h-3" />
                                         {tag}
                                     </span>
@@ -175,36 +203,43 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                     )}
 
                     {/* Date */}
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
                         <Calendar className="w-4 h-4" />
-                        Posted {new Date(job.created_at).toLocaleDateString()}
+                        Posted {new Date(job.created_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}
                     </div>
 
                     {/* Applications (for creator) with Review button */}
                     {isCreator && applications && applications.length > 0 && (
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-gray-700 mb-3">
+                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+                                <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
                                 Applications ({applications.length})
                             </h3>
                             <div className="space-y-3">
                                 {applications.map((app: Application) => (
-                                    <div key={app.id} className="p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <p className="text-sm text-gray-700 mb-1">{app.pitch}</p>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`tag text-xs ${app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                                                        app.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
-                                                            'bg-red-50 text-red-700'
-                                                        }`}>{app.status}</span>
-                                                    <span className="text-xs text-gray-400">
+                                    <div key={app.id} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-600 transition-all hover:border-gray-200 dark:hover:border-gray-500">
+                                        <div className="flex justify-between items-start gap-4">
+                                            <div className="flex-1">
+                                                <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">{app.pitch}</p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className={`px-2 py-1 rounded-md text-xs font-semibold ${app.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                            app.status === 'ACCEPTED' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                        }`}>
+                                                        {app.status}
+                                                    </span>
+                                                    <span className="text-xs text-gray-400 dark:text-gray-500">
                                                         {new Date(app.created_at).toLocaleDateString()}
                                                     </span>
                                                     {/* Review Button for Creator */}
                                                     {app.status === 'ACCEPTED' && job.status === 'COMPLETED' && (
                                                         <button
                                                             onClick={() => handleOpenReview(app.applicant_id, 'Applicant')}
-                                                            className="text-xs flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium ml-2"
+                                                            className="inline-flex items-center gap-1 text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 ml-2 transition-colors"
                                                         >
                                                             <Star className="w-3 h-3" />
                                                             Review Applicant
@@ -213,11 +248,11 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                                                 </div>
                                             </div>
                                             {app.status === 'PENDING' && (
-                                                <div className="flex gap-1">
+                                                <div className="flex gap-1.5">
                                                     <button
                                                         onClick={() => updateApplicationStatusMutation.mutate({ appId: app.id, status: 'ACCEPTED' })}
                                                         disabled={updateApplicationStatusMutation.isPending}
-                                                        className="p-1 hover:bg-green-100 rounded text-green-600"
+                                                        className="p-2 rounded-lg bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 text-green-600 dark:text-green-400 transition-all disabled:opacity-50"
                                                         title="Accept"
                                                     >
                                                         <CheckCircle className="w-4 h-4" />
@@ -225,7 +260,7 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                                                     <button
                                                         onClick={() => updateApplicationStatusMutation.mutate({ appId: app.id, status: 'REJECTED' })}
                                                         disabled={updateApplicationStatusMutation.isPending}
-                                                        className="p-1 hover:bg-red-100 rounded text-red-600"
+                                                        className="p-2 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 transition-all disabled:opacity-50"
                                                         title="Reject"
                                                     >
                                                         <X className="w-4 h-4" />
@@ -241,21 +276,21 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
 
                     {/* Apply Form (for non-creators) */}
                     {!isCreator && showApplyForm && (
-                        <div className="p-4 bg-orange-50 rounded-lg">
-                            <h3 className="text-sm font-medium text-gray-700 mb-2">Your Pitch</h3>
+                        <div className="p-5 bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 rounded-xl border border-orange-200 dark:border-orange-900/30">
+                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Your Pitch</h3>
                             <textarea
                                 value={pitch}
                                 onChange={(e) => setPitch(e.target.value)}
                                 placeholder="Tell them why you're perfect for this gig..."
-                                className="input-clean resize-none mb-3"
+                                className="input-clean resize-none mb-4"
                                 rows={4}
                                 required
                             />
-                            <div className="flex gap-2">
+                            <div className="flex gap-3">
                                 <button
                                     onClick={() => applyMutation.mutate()}
                                     disabled={!pitch.trim() || applyMutation.isPending}
-                                    className="btn-primary flex items-center gap-2"
+                                    className="btn-primary flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                     {applyMutation.isPending ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -276,35 +311,43 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-gray-100 flex justify-between">
+                <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 flex justify-between items-center gap-4">
                     {isCreator ? (
                         <div className="flex gap-2">
                             <button
                                 onClick={() => deleteMutation.mutate()}
                                 disabled={deleteMutation.isPending}
-                                className="btn-secondary text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                className="px-4 py-2 rounded-xl font-medium text-sm text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 flex items-center gap-2 transition-all disabled:opacity-60"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                {deleteMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Trash2 className="w-4 h-4" />
+                                )}
                                 Delete
                             </button>
                             {job.status === 'OPEN' && (
                                 <button
                                     onClick={() => updateStatusMutation.mutate('COMPLETED')}
                                     disabled={updateStatusMutation.isPending}
-                                    className="btn-secondary text-green-600 hover:bg-green-50 flex items-center gap-2"
+                                    className="px-4 py-2 rounded-xl font-medium text-sm text-green-600 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:text-green-400 flex items-center gap-2 transition-all disabled:opacity-60"
                                 >
-                                    <CheckCircle className="w-4 h-4" />
+                                    {updateStatusMutation.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <CheckCircle className="w-4 h-4" />
+                                    )}
                                     Mark Complete
                                 </button>
                             )}
                         </div>
                     ) : (
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                             {/* Review Button for Applicant */}
                             {hasAlreadyApplied && job.status === 'COMPLETED' && (
                                 <button
                                     onClick={() => handleOpenReview(job.creator_id, creatorName)}
-                                    className="btn-primary flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 border-yellow-600"
+                                    className="px-4 py-2 rounded-xl font-medium text-sm text-white bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 flex items-center gap-2 transition-all shadow-lg shadow-orange-500/20"
                                 >
                                     <Star className="w-4 h-4" />
                                     Leave Review
@@ -312,8 +355,9 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                             )}
 
                             {hasAlreadyApplied ? (
-                                <span className="text-sm text-green-600 font-medium py-2">
-                                    ✓ Already Applied
+                                <span className="inline-flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium py-2 px-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Already Applied
                                 </span>
                             ) : (
                                 !showApplyForm && job.status === 'OPEN' && (
@@ -339,7 +383,10 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
                             </button>
                         </div>
                     )}
-                    <button onClick={onClose} className="btn-secondary">
+                    <button
+                        onClick={onClose}
+                        className="btn-secondary"
+                    >
                         Close
                     </button>
                 </div>
@@ -361,4 +408,3 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
         </div>
     )
 }
-

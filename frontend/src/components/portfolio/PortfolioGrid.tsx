@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { PortfolioItem, portfolioApi } from '@/api/portfolio'
 
-import { Trash2, ExternalLink, FileText, X, Eye } from 'lucide-react'
+import { Trash2, ExternalLink, FileText, X, Eye, FolderOpen } from 'lucide-react'
 
 interface PortfolioGridProps {
     items: PortfolioItem[]
@@ -10,19 +10,6 @@ interface PortfolioGridProps {
 }
 
 export function PortfolioGrid({ items, isOwner }: PortfolioGridProps) {
-    // const { user } = useAuthStore() (REMOVED)
-    // Actually simpler to just remove the line if unused.
-    // But `useAuthStore` might be needed if I removed `user`.
-    // Wait, line 4 imports `useAuthStore`.
-    // Line 13 uses it.
-    // If I remove line 13, I might need to remove import too if `useAuthStore` is not used elsewhere.
-    // Let's check if `useAuthStore` is used.
-    // It is imported on line 4. And used on line 13.
-    // If I remove `const { user } = useAuthStore()`, then `useAuthStore` import might be unused.
-    // I should check if `useAuthStore` is used elsewhere.
-    // Looking at the file content: `useAuthStore` is only used on line 13.
-    // So I should remove line 13 AND line 4.
-
     const queryClient = useQueryClient()
     const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null)
 
@@ -42,54 +29,67 @@ export function PortfolioGrid({ items, isOwner }: PortfolioGridProps) {
 
     if (items.length === 0) {
         return (
-            <div className="text-center py-12 text-gray-500">
-                <p>No portfolio items yet.</p>
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 flex items-center justify-center mb-4">
+                    <FolderOpen className="w-10 h-10 text-orange-400 dark:text-orange-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">No portfolio items yet</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm">
+                    {isOwner ? "Add your first project to showcase your work and skills!" : "This user hasn't added any portfolio items yet."}
+                </p>
             </div>
         )
     }
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {items.map(item => (
                     <div
                         key={item.id}
-                        className="group relative bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                        className="group relative bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/5 dark:hover:shadow-orange-500/10 hover:-translate-y-1"
                         onClick={() => setSelectedItem(item)}
                     >
                         {/* Aspect Ratio Box */}
-                        <div className="aspect-video bg-gray-50 relative flex items-center justify-center overflow-hidden">
+                        <div className="aspect-video bg-gray-50 dark:bg-gray-900 relative flex items-center justify-center overflow-hidden">
                             {item.file_type === 'image' && item.file_url ? (
                                 <img
                                     src={item.file_url}
                                     alt={item.title}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
                             ) : item.file_type === 'pdf' ? (
-                                <FileText className="w-12 h-12 text-gray-300" />
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="w-16 h-16 rounded-lg bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                                        <FileText className="w-8 h-8 text-red-400 dark:text-red-500" />
+                                    </div>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">PDF Document</span>
+                                </div>
                             ) : (
                                 <div className="text-center p-4">
-                                    <ExternalLink className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                                    <span className="text-xs text-blue-500 block truncate max-w-[200px]">{item.link}</span>
+                                    <div className="w-12 h-12 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-2">
+                                        <ExternalLink className="w-6 h-6 text-blue-400 dark:text-blue-500" />
+                                    </div>
+                                    <span className="text-xs text-blue-500 dark:text-blue-400 block truncate max-w-[200px] font-medium">{item.link}</span>
                                 </div>
                             )}
 
                             {/* Overlay */}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                <span className="text-white text-sm font-medium flex items-center gap-1">
-                                    <Eye className="w-4 h-4" /> View
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 text-sm font-medium rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                    <Eye className="w-4 h-4" /> View Details
                                 </span>
                             </div>
                         </div>
 
                         {/* Content */}
                         <div className="p-4">
-                            <div className="flex justify-between items-start mb-1">
-                                <h4 className="font-semibold text-gray-900 truncate pr-4">{item.title}</h4>
+                            <div className="flex justify-between items-start gap-2 mb-2">
+                                <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate flex-1">{item.title}</h4>
                                 {isOwner && (
                                     <button
                                         onClick={(e) => handleDelete(item.id, e)}
-                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-200 opacity-0 group-hover:opacity-100"
                                         title="Delete"
                                     >
                                         <Trash2 className="w-4 h-4" />
@@ -97,7 +97,7 @@ export function PortfolioGrid({ items, isOwner }: PortfolioGridProps) {
                                 )}
                             </div>
                             {item.description && (
-                                <p className="text-sm text-gray-500 line-clamp-2">{item.description}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{item.description}</p>
                             )}
                         </div>
                     </div>
@@ -107,26 +107,34 @@ export function PortfolioGrid({ items, isOwner }: PortfolioGridProps) {
             {/* Lightbox / Detail Modal */}
             {selectedItem && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/80" onClick={() => setSelectedItem(null)} />
+                    <div
+                        className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-backdrop"
+                        onClick={() => setSelectedItem(null)}
+                    />
 
-                    <div className="relative max-w-4xl w-full bg-white rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-fade-in">
-                        <div className="flex justify-between items-center p-4 border-b">
-                            <h3 className="font-semibold text-lg">{selectedItem.title}</h3>
-                            <button onClick={() => setSelectedItem(null)} className="p-1 hover:bg-gray-100 rounded-full">
-                                <X className="w-5 h-5" />
+                    <div className="relative max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-modal-in">
+                        <div className="flex justify-between items-center p-5 border-b border-gray-100 dark:border-gray-700">
+                            <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{selectedItem.title}</h3>
+                            <button
+                                onClick={() => setSelectedItem(null)}
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                            >
+                                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                             </button>
                         </div>
 
-                        <div className="p-6 overflow-y-auto bg-gray-50 flex-1 flex flex-col items-center justify-center min-h-[300px]">
+                        <div className="p-6 overflow-y-auto bg-gray-50 dark:bg-gray-900 flex-1 flex flex-col items-center justify-center min-h-[300px] modal-scrollbar">
                             {selectedItem.file_type === 'image' && selectedItem.file_url ? (
                                 <img
                                     src={selectedItem.file_url}
                                     alt={selectedItem.title}
-                                    className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-sm"
+                                    className="max-w-full max-h-[60vh] object-contain rounded-xl shadow-lg"
                                 />
                             ) : selectedItem.file_type === 'pdf' && selectedItem.file_url ? (
                                 <div className="text-center">
-                                    <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                                    <div className="w-24 h-24 rounded-2xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-6">
+                                        <FileText className="w-12 h-12 text-red-400 dark:text-red-500" />
+                                    </div>
                                     <a
                                         href={selectedItem.file_url}
                                         target="_blank"
@@ -138,9 +146,11 @@ export function PortfolioGrid({ items, isOwner }: PortfolioGridProps) {
                                 </div>
                             ) : selectedItem.link ? (
                                 <div className="text-center w-full max-w-lg">
-                                    <div className="bg-white p-6 rounded-xl border shadow-sm mb-4">
-                                        <ExternalLink className="w-12 h-12 mx-auto mb-4 text-blue-500" />
-                                        <p className="text-gray-900 font-medium break-all mb-4">{selectedItem.link}</p>
+                                    <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                                        <div className="w-16 h-16 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-6">
+                                            <ExternalLink className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+                                        </div>
+                                        <p className="text-gray-900 dark:text-gray-100 font-medium break-all mb-6">{selectedItem.link}</p>
                                         <a
                                             href={selectedItem.link}
                                             target="_blank"
@@ -154,8 +164,8 @@ export function PortfolioGrid({ items, isOwner }: PortfolioGridProps) {
                             ) : null}
 
                             {selectedItem.description && (
-                                <div className="mt-8 text-center max-w-2xl bg-white p-4 rounded-lg shadow-sm border">
-                                    <p className="text-gray-700 whitespace-pre-wrap">{selectedItem.description}</p>
+                                <div className="mt-8 text-center max-w-2xl bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedItem.description}</p>
                                 </div>
                             )}
                         </div>
